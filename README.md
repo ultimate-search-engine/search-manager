@@ -14,6 +14,13 @@ made with Kotlin
 java -jar build/libs/searchmanager-1.0.jar
 ```
 
+## Docker
+
+```sh
+docker build . -t searchmanager
+docker run -it -p 8080:8080 searchmanager
+```
+
 ## Perform Search
 
 ```sh

@@ -21,7 +21,7 @@ class Server(port: Int) {
     private suspend fun PipelineContext<Unit, ApplicationCall>.jsonResponse(json: String) =
         call.respondText(json, ContentType.Application.Json)
 
-    private val server = embeddedServer(Netty, port) {
+    private val server = embeddedServer(Netty, port=port, host="0.0.0.0") {
         routing {
             get("/search") {
                 val query = context.parameters["q"] ?: ""
