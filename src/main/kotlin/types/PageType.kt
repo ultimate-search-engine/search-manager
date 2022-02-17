@@ -1,96 +1,113 @@
 package cz.sspuopava.searchengine.searchmanager.types
 
-data class PageMetadata(
-    val title: String?,
-    val author: String?,
-    val description: String?,
-    val openGraphImgURL: String?,
-    val openGraphTitle: String?,
-    val type: String?,
-    val tags: List<String>?,
-    val siteName: String?,
-    val hasIcon: Boolean,
-    val language: String?,
+open class Metadata(
+    open val title: String,
+    open val description: String,
+    open val openGraphImgURL: String,
+    open val openGraphTitle: String,
+    open val openGraphDescription: String,
+    open val type: String,
+    open val tags: List<String>,
 ) {
-    constructor() : this(
-        title = null,
-        author = null,
-        description = null,
-        openGraphImgURL = null,
-        openGraphTitle = null,
-        type = null,
-        tags = null,
-        siteName = null,
-        hasIcon = false,
-        language = null,
-    )
+    constructor() : this("", "", "", "", "", "", listOf())
 }
 
-data class PageBodyHeadings(
-    val h1: List<String>?,
-    val h2: List<String>?,
-    val h3: List<String>?,
-    val h4: List<String>?,
-    val h5: List<String>?,
-    val h6: List<String>?,
+open class Headings(
+    open val h1: List<String>,
+    open val h2: List<String>,
+    open val h3: List<String>,
+    open val h4: List<String>,
+    open val h5: List<String>,
+    open val h6: List<String>,
 ) {
-    constructor() : this(
-        h1 = null,
-        h2 = null,
-        h3 = null,
-        h4 = null,
-        h5 = null,
-        h6 = null,
-    )
+    constructor() : this(listOf(), listOf(), listOf(), listOf(), listOf(), listOf())
 }
 
-data class PageLink(
-    val innerText: String?,
-    var href: String,
-    val bias: Double?,
+open class ForwardLink(
+    open val text: String,
+    open val href: String,
 ) {
     @Suppress("unused")
-    constructor() : this(
-        innerText = null,
-        href = "",
-        bias = null,
-    )
+    constructor() : this("", "")
 }
 
-data class PageBody(
-    val headings: PageBodyHeadings,
-    val plaintext: List<String>?,
-    val article: List<String>?,
-    val internalLinks: List<PageLink>?,
-    val externalLinks: List<PageLink>?,
+open class BodyLinks(
+    open val internal: List<ForwardLink>,
+    open val external: List<ForwardLink>,
 ) {
-    constructor() : this(
-        headings = PageBodyHeadings(),
-        plaintext = null,
-        article = null,
-        internalLinks = null,
-        externalLinks = null,
-    )
+    constructor() : this(listOf(), listOf())
 }
 
-data class Page(
-    val metadata: PageMetadata,
-    val body: PageBody, // ??
+open class Body(
+    open val headings: Headings,
+    open val boldText: List<String>,
+    open val article: List<String>,
+    open val links: BodyLinks,
+) {
+    constructor() : this(Headings(), listOf(), listOf(), BodyLinks())
+}
 
-    val url: String,
-    val crawlerTimestamp: Long,
-    val userRating: Double,
-    val bias: Double,
-    val createdTimestamp: Long
+open class BackLink(
+    open val text: String,
+    open val source: String,
 ) {
     @Suppress("unused")
+    constructor() : this("", "")
+}
+
+open class Ranks(
+    @Suppress("unused")
+    open var pagerank: Double,
+    @Suppress("unused")
+    open var computeRoundId: Long?,
+    @Suppress("unused")
+    open val smartRank: Double?,
+) {
+    constructor() : this(0.0, null, null)
+}
+
+open class InferredData(
+    open var backLinks: List<BackLink>,
+    open val ranks: Ranks,
+    open var domainName: String,
+) {
+    constructor() : this(listOf(), Ranks(), "")
+//    constructor(backLinks: List<BackLink>) : this(backLinks, Ranks(), null, "")
+}
+
+enum class CrawlerStatus {
+    Crawled,
+    NotCrawled,
+    AwaitingPagerank,
+    DoesNotExist,
+    Error,
+}
+
+open class Address(
+    @Suppress("unused")
+    open val url: String,
+    @Suppress("unused")
+    open var urlAsText: List<String>,
+) {
+    constructor() : this("", listOf())
+}
+
+open class PageType(
+    open val metadata: Metadata,
+    open val body: Body,
+    open val inferredData: InferredData,
+
+    open val address: Address,
+    open val crawlerTimestamp: Long = System.currentTimeMillis(),
+    open val crawlerStatus: CrawlerStatus,
+) {
     constructor() : this(
-        metadata = PageMetadata(),
-        body = PageBody(),
-        url = "",
-        crawlerTimestamp = 0,
-        userRating = 0.0,
-        bias = 0.0,
-        createdTimestamp = 0
+        Metadata(),
+        Body(),
+        InferredData(),
+        Address(),
+        System.currentTimeMillis(),
+        CrawlerStatus.NotCrawled
     )
 }
+

@@ -2,7 +2,7 @@ package cz.sspuopava.searchengine.searchmanager.search.searchers
 
 import co.elastic.clients.elasticsearch.core.SearchRequest
 import co.elastic.clients.elasticsearch.core.SearchResponse
-import cz.sspuopava.searchengine.searchmanager.types.Page
+import cz.sspuopava.searchengine.searchmanager.types.PageType
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import org.json.JSONArray
@@ -16,26 +16,24 @@ class Fulltext : Searcher {
         index: String,
         startFrom: Int = 0,
         length: Int = 20
-    ): SearchResponse<Page> = coroutineScope {
+    ): SearchResponse<PageType> = coroutineScope {
         async {
             elastic.client.search({ s: SearchRequest.Builder ->
                 s.index(index).query { query ->
                     query.multiMatch {
                         it.query(requestedQuery)
-                        it.fuzziness("2")
+                        it.fuzziness("3")
                         it.fields(
-                            "metadata.title^10",
-                            "body.headings.h1^10",
-                            "metadata.description^8",
-                            "body.headings.h2^8",
-                            "body.headings.h3^6",
-                            "body.headings.h4^4",
-                            "body.article^2",
-                            "body.plaintext"
+                            "inferredData.backLinks.text^2",
+                            "address.urlAsText^5",
+                            "metadata.title^4",
+                            "body.headings.h1^3",
+                            "body.headings.h2",
+                            "body.links.internal.text",
                         )
                     }
                 }.from(startFrom).size(length)
-            }, Page::class.java)
+            }, PageType::class.java)
         }
     }.await()
 
@@ -48,7 +46,7 @@ class Fulltext : Searcher {
                 JSONArray().apply {
                     hits.forEach {
                         put(JSONObject().apply {
-                            put("url", it?.url)
+                            put("url", it?.address?.url)
                             put("title", it?.metadata?.title)
                             put("description", it?.metadata?.description)
                             // these might not be used
