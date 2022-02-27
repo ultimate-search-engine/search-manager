@@ -1,7 +1,6 @@
 package cz.sspuopava.searchengine.searchmanager.search
 
 import cz.sspuopava.searchengine.searchmanager.search.searchers.Fulltext
-import cz.sspuopava.searchengine.searchmanager.search.searchers.Hints
 import cz.sspuopava.searchengine.searchmanager.search.searchers.SearcherResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -14,13 +13,13 @@ import kotlin.time.measureTimedValue
 
 class Orchestrator {
     private val fulltext = Fulltext()
-    private val hints = Hints()
+//    private val hints = Hints()
     private val logger = Logger.getLogger(this.javaClass)
 
     @OptIn(ExperimentalTime::class)
-    private suspend fun performSearch(query: String, index: String, pagination: Int, length: Int): JSONObject =
+    private suspend fun performSearch(query: String, pagination: Int, length: Int): JSONObject =
         coroutineScope {
-            val fulltextResultsAsync = async { fulltext.search(query, index, pagination, length) }
+            val fulltextResultsAsync = async { fulltext.search(query, pagination, length) }
 //        val hintsResultsAsync = async { hints... }
 
             val (fulltextResults: SearcherResult, duration: Duration) = measureTimedValue {
@@ -30,13 +29,13 @@ class Orchestrator {
             return@coroutineScope JSONObject().apply {
                 put("fulltext", JSONObject().apply {
                     put("results", JSONArray(fulltextResults.results))
-                    put("duration", duration.inWholeMicroseconds)
+                    put("duration", duration.inWholeMilliseconds)
                 })
             }
         }
 
-    suspend fun search(query: String, index: String, pagination: Int, length: Int): JSONObject {
+    suspend fun search(query: String, pagination: Int, length: Int): JSONObject {
         logger.debug("Received query: $query")
-        return performSearch(query, index, pagination, length)
+        return performSearch(query, pagination, length)
     }
 }

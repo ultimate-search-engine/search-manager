@@ -25,13 +25,10 @@ class Server(port: Int) {
         routing {
             get("/search") {
                 val query = context.parameters["q"] ?: ""
-                val index = context.parameters["index"] ?: ""
-                val pagination = context.parameters["pagination"]?.toIntOrNull() ?: 0
                 val length = context.parameters["length"]?.toIntOrNull() ?: 16
-                if (index.isEmpty()) jsonResponse(
-                    JSONObject().put("error", "index parameter is empty").put("status", "400")
-                )
-                else jsonResponse(orchestrator.search(query, index, pagination, length))
+                val pagination = context.parameters["pagination"]?.toIntOrNull() ?: 0
+//                val lang = context.parameters["lang"] ?: "en"
+                jsonResponse(orchestrator.search(query, pagination, length))
             }
         }
     }

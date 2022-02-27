@@ -1,0 +1,4 @@
+GET http://localhost:8080/search?q=community+github&length=20&pagination=0
+Accept: application/json
+
+###
