@@ -37,6 +37,12 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-core:2.17.1'
     implementation 'org.slf4j:slf4j-log4j12:1.7.36'
 
+    implementation('org.jsoup:jsoup:1.15.3')
+
+    implementation("org.litote.kmongo:kmongo:4.5.1")
+    implementation("org.litote.kmongo:kmongo-async:4.5.1")
+    implementation("org.litote.kmongo:kmongo-coroutine:4.5.1")
+
     implementation(files("libraries/lib.jar"))
 
     // Unit tests
