@@ -55,28 +55,33 @@ class Fulltext : Searcher {
                                     "content.text",
                                     "content.title^4"
                                 )
-                                mm.fuzziness("1")
+                                mm.fuzziness("AUTO")
                             }
-                        }, Query.of { query ->
+                        }
+                        ,
+                        Query.of { query ->
                             query.rankFeature { rf ->
                                 rf.field("ranks.smartRank.rankFeature")
                                 rf.log { it.scalingFactor(2.0F) }
 //                            rf.linear { it }
                                 rf.boost(3.0F)
                             }
-                        }, Query.of { query ->
+                        },
+                        Query.of { query ->
                             query.rankFeature { rf ->
                                 rf.field("ranks.urlSegmentsCount.negative")
 //                            rf.linear { it }
                                 rf.boost(2.0F)
                             }
-                        }, Query.of { query ->
+                        },
+                        Query.of { query ->
                             query.rankFeature { rf ->
-                                rf.field("ranks.totalUrlDocs.rankFeature")
+                                rf.field("ranks.totalUrlDocs.positive")
 //                            rf.linear { it }
                                 rf.boost(1.0F)
                             }
-                        })
+                        }
+                    )
                     )
                 }
             }
@@ -96,9 +101,11 @@ class Fulltext : Searcher {
 
     suspend fun search(query: String, pagination: Int = 0, length: Int = 16): SearcherResult =
         coroutineScope {
-            val result = withContext(Dispatchers.IO) { performFulltextSearch(query, length * 10, pagination * length) }
+            val result =
+                withContext(Dispatchers.IO) { performFulltextSearch(query, length * 10, pagination * length) }
             val hits = result.hits()?.hits()?.map { it.source() }
                 ?: emptyList()
+            println(hits)
 
             return@coroutineScope SearcherResult(JSONArray().apply {
                 hits.distinctBy { it?.url }.take(length).forEach { hit ->
