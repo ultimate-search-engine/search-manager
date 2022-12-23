@@ -2,6 +2,7 @@ package cz.sspuopava.searchengine.searchmanager.server
 
 import cz.sspuopava.searchengine.searchmanager.search.Orchestrator
 import io.ktor.application.*
+import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -21,7 +22,15 @@ class Server(port: Int) {
     private suspend fun PipelineContext<Unit, ApplicationCall>.jsonResponse(json: String) =
         call.respondText(json, ContentType.Application.Json)
 
-    private val server = embeddedServer(Netty, port=port, host="0.0.0.0") {
+    private val server = embeddedServer(Netty, port = port, host = "0.0.0.0") {
+//        install(CORS) {
+//            method(HttpMethod.Options)
+//            method(HttpMethod.Put)
+//            method(HttpMethod.Delete)
+//            method(HttpMethod.Patch)
+//            header(HttpHeaders.Authorization)
+//            anyHost()
+//        }
         routing {
             get("/search") {
                 val query = context.parameters["q"] ?: ""
@@ -33,6 +42,6 @@ class Server(port: Int) {
         }
     }
 
-    fun run() = server.start(wait=true)
+    fun run() = server.start(wait = true)
 
 }

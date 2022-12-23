@@ -55,7 +55,7 @@ class Fulltext : Searcher {
                                     "content.text",
                                     "content.title^4"
                                 )
-                                mm.fuzziness("AUTO")
+                                mm.fuzziness("1")
                             }
                         }
                         ,
